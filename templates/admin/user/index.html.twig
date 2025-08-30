@@ -1,0 +1,82 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Users{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+    <h2>Users</h2>
+    <a href="{{ path('admin_user_create') }}" class="btn btn-primary mb-3">Create User</a>
+
+    {% for message in app.flashes('success') %}
+        <div class="alert alert-success">{{ message }}</div>
+    {% endfor %}
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>DOB</th>
+                <th>Joined At</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in users %}
+            <tr>
+                <td>{{ user.name }}</td>
+                <td>{{ user.email }}</td>
+                <td>{{ user.roles|join(', ') }}</td>
+                <td>{{ user.dob ? user.dob|date('d M Y') : '' }}</td>
+                <td>{{ user.joinedAt ? user.joinedAt|date('d M Y') : '' }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
+{% block stylesheets %}
+{{ parent() }}
+<style>
+    .dashboard-card {
+        transition: transform 0.15s, box-shadow 0.15s;
+        cursor: pointer;
+    }
+    .dashboard-card:hover {
+        transform: translateY(-4px) scale(1.03);
+        box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.15);
+        opacity: 0.95;
+    }
+    #wrapper.toggled #sidebar-wrapper {
+        margin-left: -260px;
+        transition: margin 0.3s;
+    }
+    #sidebar-wrapper {
+        transition: margin 0.3s;
+    }
+    @media (max-width: 991.98px) {
+        #sidebar-wrapper {
+            margin-left: -260px;
+            position: fixed;
+            z-index: 1040;
+        }
+        #wrapper.toggled #sidebar-wrapper {
+            margin-left: 0;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script>
+    // Sidebar toggle
+    const sidebarToggle = document.getElementById('sidebarToggle');
+    const wrapper = document.getElementById('wrapper');
+    if (sidebarToggle && wrapper) {
+        sidebarToggle.addEventListener('click', () => {
+            wrapper.classList.toggle('toggled');
+        });
+    }
+</script>
+{% endblock %}

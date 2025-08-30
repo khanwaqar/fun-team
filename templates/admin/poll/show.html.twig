@@ -1,0 +1,119 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Poll Details{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+<style>
+    .poll-chart-container {
+        max-width: 400px;
+        margin: 0 auto 2rem auto;
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="d-flex" id="wrapper">
+    {% include 'admin/_partials/_sidebar.html.twig' %}
+    <div id="page-content-wrapper" class="flex-grow-1">
+        {% include 'admin/_partials/_navbar.html.twig' %}
+        <div class="container mt-4">
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h2 class="fw-bold mb-2">{{ poll.title }}</h2>
+                    <p class="mb-1">{{ poll.description }}</p>
+                    <div class="mb-2">
+                        <span class="fw-semibold">Status:</span>
+                        {% if poll.status == 'active' %}
+                            <span class="badge bg-success">Active</span>
+                        {% elseif poll.status == 'completed' %}
+                            <span class="badge bg-secondary">Completed</span>
+                        {% else %}
+                            <span class="badge bg-light text-dark">{{ poll.status|capitalize }}</span>
+                        {% endif %}
+                    </div>
+                    <div class="mb-2">
+                        <span class="fw-semibold">End Date:</span>
+                        {{ poll.endDate ? poll.endDate|date('d M Y H:i') : 'N/A' }}
+                    </div>
+                    {% if poll.event %}
+                        <div class="mb-2">
+                            <span class="fw-semibold">Associated Event:</span>
+                            {{ poll.event.title }}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="poll-chart-container mb-4">
+                <canvas id="pollOptionsChart"></canvas>
+            </div>
+
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-white fw-bold">
+                    <i class="bi bi-list-ol me-2"></i>Options & Votes
+                </div>
+                <div class="card-body p-0">
+                    <table class="table table-bordered mb-0">
+                        <thead>
+                            <tr>
+                                <th>Option</th>
+                                <th>Votes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for option in options %}
+                            <tr>
+                                <td>{{ option.title }}</td>
+                                <td>{{ option.getVotesCount() }}</td>
+                            </tr>
+                        {% else %}
+                            <tr>
+                                <td colspan="2" class="text-center text-muted">No options available.</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <a href="{{ path('admin_poll_index') }}" class="btn btn-secondary">
+                <i class="bi bi-arrow-left me-1"></i> Back to list
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var ctx = document.getElementById('pollOptionsChart');
+        if (ctx) {
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: [{% for option in options %}'{{ option.title|e('js') }}',{% endfor %}],
+                    datasets: [{
+                        data: [{% for option in options %}{{ option.getVotesCount() }},{% endfor %}],
+                        backgroundColor: [
+                            'rgba(54, 162, 235, 0.7)',
+                            'rgba(255, 99, 132, 0.7)',
+                            'rgba(255, 206, 86, 0.7)',
+                            'rgba(75, 192, 192, 0.7)',
+                            'rgba(153, 102, 255, 0.7)',
+                            'rgba(255, 159, 64, 0.7)'
+                        ]
+                    }]
+                },
+                options: {
+                    plugins: {
+                        legend: { display: true, position: 'bottom' }
+                    }
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}

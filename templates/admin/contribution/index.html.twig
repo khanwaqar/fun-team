@@ -1,0 +1,87 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Contributions{% endblock %}
+
+{% block body %}
+<div class="d-flex" id="wrapper">
+    {% include 'admin/_partials/_sidebar.html.twig' %}
+
+    <div id="page-content-wrapper" class="flex-grow-1">
+        {% include 'admin/_partials/_navbar.html.twig' %}
+        <div class="container mt-4">
+            <h2>Contributions</h2>
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>User</th>
+                        <th>Month</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for c in contributions %}
+                    <tr>
+                        <td>{{ c.user.name }}</td>
+                        <td>{{ c.month }}</td>
+                        <td>{{ c.amount }}</td>
+                        <td>{{ c.status }}</td>
+                        <td>
+                            {% if c.status != 'paid' %}
+                                <a href="{{ path('admin_contribution_mark_paid', {id: c.id}) }}" class="btn btn-sm btn-success">Mark Paid</a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block stylesheets %}
+{{ parent() }}
+<style>
+    .dashboard-card {
+        transition: transform 0.15s, box-shadow 0.15s;
+        cursor: pointer;
+    }
+    .dashboard-card:hover {
+        transform: translateY(-4px) scale(1.03);
+        box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.15);
+        opacity: 0.95;
+    }
+    #wrapper.toggled #sidebar-wrapper {
+        margin-left: -260px;
+        transition: margin 0.3s;
+    }
+    #sidebar-wrapper {
+        transition: margin 0.3s;
+    }
+    @media (max-width: 991.98px) {
+        #sidebar-wrapper {
+            margin-left: -260px;
+            position: fixed;
+            z-index: 1040;
+        }
+        #wrapper.toggled #sidebar-wrapper {
+            margin-left: 0;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script>
+    // Sidebar toggle
+    const sidebarToggle = document.getElementById('sidebarToggle');
+    const wrapper = document.getElementById('wrapper');
+    if (sidebarToggle && wrapper) {
+        sidebarToggle.addEventListener('click', () => {
+            wrapper.classList.toggle('toggled');
+        });
+    }
+</script>
+{% endblock %}

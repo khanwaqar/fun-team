@@ -1,0 +1,29 @@
+{% extends 'base.html.twig' %}
+<!-- Active Polls -->
+<div class="col-md-4">
+    <div class="card border-info mb-3">
+        <div class="card-header">Active Polls</div>
+        <div class="card-body">
+            {% if activePolls %}
+                {% for p in activePolls %}
+                    <h6>{{ p.title }}</h6>
+                    {% if not pollService.hasUserVoted(p, app.user) %}
+                        <form method="post" action="{{ path('poll_vote', {optionId: p.options[0].id}) }}">
+                            {% for opt in p.options %}
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="option" id="opt{{ opt.id }}" value="{{ opt.id }}">
+                                    <label class="form-check-label" for="opt{{ opt.id }}">{{ opt.title }}</label>
+                                </div>
+                            {% endfor %}
+                            <button class="btn btn-primary btn-sm mt-2">Vote</button>
+                        </form>
+                    {% else %}
+                        <p>You've already voted.</p>
+                    {% endif %}
+                {% endfor %}
+            {% else %}
+                <p class="card-text">No active polls.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>

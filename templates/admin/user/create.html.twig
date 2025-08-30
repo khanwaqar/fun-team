@@ -1,0 +1,80 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Create User{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+    <h2>Create User</h2>
+    <form method="post">
+        <div class="mb-3">
+            <label class="form-label">Name</label>
+            <input type="text" name="name" class="form-control" required>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Email</label>
+            <input type="email" name="email" class="form-control" required>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Password</label>
+            <input type="text" name="password" class="form-control" value="default123">
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Role</label>
+            <select name="role" class="form-select">
+                <option value="ROLE_USER">User</option>
+                <option value="ROLE_SUPER_ADMIN">Super Admin</option>
+            </select>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Date of Birth</label>
+            <input type="date" name="dob" class="form-control">
+        </div>
+        <button type="submit" class="btn btn-success">Create</button>
+    </form>
+</div>
+{% endblock %}
+{% block stylesheets %}
+{{ parent() }}
+<style>
+    .dashboard-card {
+        transition: transform 0.15s, box-shadow 0.15s;
+        cursor: pointer;
+    }
+    .dashboard-card:hover {
+        transform: translateY(-4px) scale(1.03);
+        box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.15);
+        opacity: 0.95;
+    }
+    #wrapper.toggled #sidebar-wrapper {
+        margin-left: -260px;
+        transition: margin 0.3s;
+    }
+    #sidebar-wrapper {
+        transition: margin 0.3s;
+    }
+    @media (max-width: 991.98px) {
+        #sidebar-wrapper {
+            margin-left: -260px;
+            position: fixed;
+            z-index: 1040;
+        }
+        #wrapper.toggled #sidebar-wrapper {
+            margin-left: 0;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script>
+    // Sidebar toggle
+    const sidebarToggle = document.getElementById('sidebarToggle');
+    const wrapper = document.getElementById('wrapper');
+    if (sidebarToggle && wrapper) {
+        sidebarToggle.addEventListener('click', () => {
+            wrapper.classList.toggle('toggled');
+        });
+    }
+</script>
+{% endblock %}

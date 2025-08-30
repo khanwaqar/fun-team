@@ -1,0 +1,89 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Create Poll{% endblock %}
+
+{% block body %}
+<div class="d-flex" id="wrapper">
+    {% include 'admin/_partials/_sidebar.html.twig' %}
+
+    <div id="page-content-wrapper" class="flex-grow-1">
+        {% include 'admin/_partials/_navbar.html.twig' %}
+        <div class="container mt-4">
+            <h2>Create Poll</h2>
+            <form method="post">
+                <div class="mb-3">
+                    <label class="form-label">Title</label>
+                    <input type="text" name="title" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Description</label>
+                    <textarea name="description" class="form-control"></textarea>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">End Date</label>
+                    <input type="datetime-local" name="endDate" class="form-control">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Link to Event</label>
+                    <select name="event_id" class="form-select">
+                        <option value="">-- None --</option>
+                        {% for e in events %}
+                            <option value="{{ e.id }}">{{ e.title }} ({{ e.date ? e.date|date('d M Y') : '' }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Options (comma separated)</label>
+                    <input type="text" name="options" class="form-control" placeholder="Option1,Option2,Option3">
+                </div>
+                <button type="submit" class="btn btn-success">Create Poll</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block stylesheets %}
+{{ parent() }}
+<style>
+    .dashboard-card {
+        transition: transform 0.15s, box-shadow 0.15s;
+        cursor: pointer;
+    }
+    .dashboard-card:hover {
+        transform: translateY(-4px) scale(1.03);
+        box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.15);
+        opacity: 0.95;
+    }
+    #wrapper.toggled #sidebar-wrapper {
+        margin-left: -260px;
+        transition: margin 0.3s;
+    }
+    #sidebar-wrapper {
+        transition: margin 0.3s;
+    }
+    @media (max-width: 991.98px) {
+        #sidebar-wrapper {
+            margin-left: -260px;
+            position: fixed;
+            z-index: 1040;
+        }
+        #wrapper.toggled #sidebar-wrapper {
+            margin-left: 0;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script>
+    // Sidebar toggle
+    const sidebarToggle = document.getElementById('sidebarToggle');
+    const wrapper = document.getElementById('wrapper');
+    if (sidebarToggle && wrapper) {
+        sidebarToggle.addEventListener('click', () => {
+            wrapper.classList.toggle('toggled');
+        });
+    }
+</script>
+{% endblock %}

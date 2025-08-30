@@ -1,0 +1,37 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<h1>Edit Event</h1>
+
+<form method="post">
+    <div class="mb-3">
+        <label>Title</label>
+        <input type="text" name="title" value="{{ event.title }}" class="form-control" required>
+    </div>
+    <div class="mb-3">
+        <label>Description</label>
+        <textarea name="description" class="form-control">{{ event.description }}</textarea>
+    </div>
+    <div class="mb-3">
+        <label>Location</label>
+        <input type="text" name="location" value="{{ event.location }}" class="form-control">
+    </div>
+    <div class="mb-3">
+        <label>Type</label>
+        <input type="text" name="event_type" value="{{ event.type }}" class="form-control">
+    </div>
+    <div class="mb-3">
+        <label>Date</label>
+        <input type="datetime-local" name="date" value="{{ event.date|date('Y-m-d\\TH:i') }}" class="form-control">
+    </div>
+    <div class="mb-3">
+        <label>Status</label>
+        <select name="status" class="form-control">
+            <option value="upcoming" {% if event.status == 'upcoming' %}selected{% endif %}>Upcoming</option>
+            <option value="completed" {% if event.status == 'completed' %}selected{% endif %}>Completed</option>
+            <option value="cancelled" {% if event.status == 'cancelled' %}selected{% endif %}>Cancelled</option>
+        </select>
+    </div>
+    <button class="btn btn-success">Update</button>
+</form>
+{% endblock %}

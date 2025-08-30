@@ -1,0 +1,17 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<h1>Event Details</h1>
+
+<ul>
+    <li><strong>Title:</strong> {{ event.title }}</li>
+    <li><strong>Description:</strong> {{ event.description }}</li>
+    <li><strong>Location:</strong> {{ event.location }}</li>
+    <li><strong>Type:</strong> {{ event.type }}</li>
+    <li><strong>Date:</strong> {{ event.date|date('Y-m-d H:i') }}</li>
+    <li><strong>Status:</strong> {{ event.status }}</li>
+</ul>
+
+<a href="{{ path('admin_event_edit', {id: event.id}) }}" class="btn btn-warning">Edit</a>
+<a href="{{ path('admin_event_index') }}" class="btn btn-secondary">Back to list</a>
+{% endblock %}

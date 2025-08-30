@@ -1,0 +1,295 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+<link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.css" rel="stylesheet">
+<style>
+    .dashboard-card {
+        transition: transform 0.15s, box-shadow 0.15s;
+        cursor: pointer;
+        min-height: 140px;
+    }
+    .dashboard-card:hover {
+        transform: translateY(-4px) scale(1.03);
+        box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.15);
+        opacity: 0.95;
+    }
+    .fc {
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.08);
+        padding: 10px;
+    }
+    .dashboard-logo {
+        height: 38px;
+        width: auto;
+        margin-right: 12px;
+    }
+    .dashboard-chart {
+        width: 100% !important;
+        max-width: 260px;
+        height: auto !important;
+        margin: 0 auto;
+        display: block;
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark border-bottom shadow-sm mb-4">
+    <div class="container-fluid">
+        <span class="navbar-brand fw-bold d-flex align-items-center">
+            <img src="https://odoo.zeropoint.hr/web/image/website/1/logo/Zeropoint?unique=c0af44e" alt="Logo" class="dashboard-logo">
+            Dashboard
+        </span>
+        <div class="ms-auto d-flex align-items-center">
+            <div class="dropdown">
+                <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" id="navbarUserDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                    <img src="https://ui-avatars.com/api/?name={{ app.user ? app.user.name : 'User' }}" alt="avatar" width="32" height="32" class="rounded-circle me-2">
+                    <span class="d-none d-md-inline">{{ app.user ? app.user.name : 'User' }}</span>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-end dropdown-menu-dark shadow" aria-labelledby="navbarUserDropdown">
+                    <li><a class="dropdown-item" href="#">Profile</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item" href="{{ path('app_logout') }}">Logout</a></li>
+                </ul>
+            </div>
+            <a href="{{ path('app_logout') }}" class="btn btn-outline-light ms-3 d-none d-lg-inline">Logout</a>
+        </div>
+    </div>
+</nav>
+
+<div class="container-fluid mt-4">
+    <ul class="nav nav-tabs mb-4" id="dashboardTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="overview-tab" data-bs-toggle="tab" data-bs-target="#overview" type="button" role="tab">Overview</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="calendar-tab" data-bs-toggle="tab" data-bs-target="#calendarTab" type="button" role="tab">Calendar</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="contribution-tab" data-bs-toggle="tab" data-bs-target="#contributionChartTab" type="button" role="tab">Contribution Chart</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="birthdays-tab" data-bs-toggle="tab" data-bs-target="#birthdaysTab" type="button" role="tab">Birthdays</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="active-polls-tab" data-bs-toggle="tab" data-bs-target="#activePollsTab" type="button" role="tab">Active Polls</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="completed-polls-tab" data-bs-toggle="tab" data-bs-target="#completedPollsTab" type="button" role="tab">Completed Polls</button>
+        </li>
+    </ul>
+    <div class="tab-content" id="dashboardTabsContent">
+        <div class="tab-pane fade show active" id="overview" role="tabpanel">
+            <div class="row mb-4">
+                <div class="col-12">
+                    <h2 class="fw-bold mb-0">Welcome, {{ app.user.name }}</h2>
+                </div>
+            </div>
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="card dashboard-card text-white bg-success shadow-sm">
+                        <div class="card-body text-center">
+                            <h5 class="card-title">Paid Contributions</h5>
+                            <p class="card-text display-6">PKR {{ paid|number_format(0, '.', ',') }}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card dashboard-card text-white bg-warning shadow-sm">
+                        <div class="card-body text-center">
+                            <h5 class="card-title">Unpaid Contributions</h5>
+                            <p class="card-text display-6">PKR {{ unpaid|number_format(0, '.', ',') }}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card dashboard-card text-white bg-primary shadow-sm">
+                        <div class="card-body text-center">
+                            <h5 class="card-title">Balance</h5>
+                            <p class="card-text display-6">PKR {{ balance|number_format(0, '.', ',') }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="tab-pane fade" id="calendarTab" role="tabpanel">
+            <div class="card shadow-sm mb-4 mt-4">
+                <div class="card-header bg-white fw-bold">
+                    <i class="bi bi-calendar-event me-2"></i>Events Calendar
+                </div>
+                <div class="card-body">
+                    <div id="calendar"></div>
+                </div>
+            </div>
+        </div>
+        <div class="tab-pane fade" id="contributionChartTab" role="tabpanel">
+            <div class="card shadow-sm mb-4 mt-4">
+                <div class="card-header bg-white fw-bold">
+                    <i class="bi bi-bar-chart-line me-2"></i>Contribution Chart
+                </div>
+                <div class="card-body d-flex justify-content-center">
+                    <canvas id="contributionChart" class="dashboard-chart"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="tab-pane fade" id="birthdaysTab" role="tabpanel">
+            <div class="card shadow-sm mb-4 mt-4">
+                <div class="card-header bg-white fw-bold">
+                    <i class="bi bi-gift me-2"></i>Upcoming Birthdays
+                </div>
+                <ul class="list-group list-group-flush">
+                    {% for user in upcomingBirthdays %}
+                        <li class="list-group-item">{{ user.name }} - {{ user.dob|date('d M') }}</li>
+                    {% else %}
+                        <li class="list-group-item text-muted">No birthdays soon</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        <div class="tab-pane fade" id="activePollsTab" role="tabpanel">
+            <div class="card shadow-sm mb-4 mt-4">
+                <div class="card-header bg-white fw-bold">
+                    <i class="bi bi-clipboard-check me-2"></i>Active Polls
+                </div>
+                <div class="card-body">
+                    {% for pollData in pollsWithOptions %}
+                        <div class="mb-4 border-bottom pb-3">
+                            <h5>{{ pollData.poll.title }}</h5>
+                            <p>{{ pollData.poll.description }}</p>
+                            {% if not pollData.hasVoted %}
+                                {% for option in pollData.options %}
+                                    <form action="{{ path('employee_poll_vote', {'id': option.id}) }}" method="POST" class="d-inline">
+                                        <button type="submit" class="btn btn-outline-primary btn-sm mb-1">{{ option.title }}</button>
+                                    </form>
+                                {% endfor %}
+                            {% else %}
+                                <canvas id="pollChart{{ pollData.poll.id }}" class="dashboard-chart"></canvas>
+                                <script>
+                                    document.addEventListener('DOMContentLoaded', function() {
+                                        var ctx = document.getElementById('pollChart{{ pollData.poll.id }}');
+                                        if (ctx) {
+                                            new Chart(ctx, {
+                                                type: 'pie',
+                                                data: {
+                                                    labels: [{% for v in pollData.votes %}'{{ v.title|e('js') }}',{% endfor %}],
+                                                    datasets: [{
+                                                        data: [{% for v in pollData.votes %}{{ v.count }},{% endfor %}],
+                                                        backgroundColor: [
+                                                            'rgba(54, 162, 235, 0.7)',
+                                                            'rgba(255, 99, 132, 0.7)',
+                                                            'rgba(255, 206, 86, 0.7)',
+                                                            'rgba(75, 192, 192, 0.7)'
+                                                        ]
+                                                    }]
+                                                },
+                                                options: {
+                                                    plugins: { legend: { position: 'bottom' } }
+                                                }
+                                            });
+                                        }
+                                    });
+                                </script>
+                            {% endif %}
+                        </div>
+                    {% else %}
+                        <div class="text-muted">No active polls</div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        <div class="tab-pane fade" id="completedPollsTab" role="tabpanel">
+            <div class="card shadow-sm mb-4 mt-4">
+                <div class="card-header bg-white fw-bold">
+                    <i class="bi bi-clipboard-data me-2"></i>Completed Polls
+                </div>
+                <ul class="list-group list-group-flush">
+                    {% for poll in completedPolls %}
+                        <li class="list-group-item">{{ poll.title }} - Winner: {{ poll.winnerOption.title ?? 'N/A' }}</li>
+                    {% else %}
+                        <li class="list-group-item text-muted">No completed polls</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+    let calendar;
+    function renderCalendar() {
+        var calendarEl = document.getElementById('calendar');
+        if (calendarEl && !calendar) {
+            calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                height: 400,
+                events: [
+                    {% for event in upcomingEvents %}
+                        {
+                            title: '{{ event.title|e('js') }}',
+                            start: '{{ event.date ? event.date|date('Y-m-d') : '' }}',
+                            url: '#'
+                        },
+                    {% endfor %}
+                ],
+                eventClick: function(info) {
+                    info.jsEvent.preventDefault();
+                }
+            });
+            calendar.render();
+        } else if (calendar) {
+            calendar.updateSize();
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // If calendar tab is active on load, render immediately
+        if (document.getElementById('calendarTab').classList.contains('active')) {
+            renderCalendar();
+        }
+
+        // Listen for tab shown event
+        var calendarTabBtn = document.querySelector('button[data-bs-target="#calendarTab"]');
+        if (calendarTabBtn) {
+            calendarTabBtn.addEventListener('shown.bs.tab', function (e) {
+                renderCalendar();
+            });
+        }
+
+        // Contribution Chart
+        var ctx = document.getElementById('contributionChart');
+        if (ctx) {
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Paid', 'Unpaid'],
+                    datasets: [{
+                        data: [
+                            {{ paid|default(0) }},
+                            {{ unpaid|default(0) }}
+                        ],
+                        backgroundColor: [
+                            'rgba(25, 135, 84, 0.8)',
+                            'rgba(255, 193, 7, 0.8)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    plugins: {
+                        legend: { display: true, position: 'bottom' }
+                    }
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}

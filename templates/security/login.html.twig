@@ -1,0 +1,70 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Login{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+<style>
+    body {
+        background: linear-gradient(145deg, #a71a78d7 40%, #0a0929ff 60%);
+        min-height: 100vh;
+    }
+    .login-container {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .login-card {
+        border-radius: 1rem;
+        box-shadow: 0 0.5rem 2rem rgba(0,0,0,0.10);
+        background: #fff;
+        padding: 2rem 2rem 1.5rem 2rem;
+        width: 100%;
+        max-width: 400px;
+    }
+    .login-logo {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 1.5rem;
+    }
+    .login-logo img {
+        width: 240px;
+        height: auto;
+        object-fit: contain;
+        background: none;
+        padding: 0;
+        box-shadow: none;
+        border-radius: 0;
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="login-container">
+    <div class="login-card">
+        <div class="login-logo">
+            <img src="https://odoo.zeropoint.hr/web/image/website/1/logo/Zeropoint?unique=c0af44e" alt="Logo">
+        </div>
+        <div class="text-center mb-3">
+            <h3 class="fw-bold">Fun Team Login</h3>
+        </div>
+        {% if error %}
+            <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+        {% endif %}
+
+        <form method="post">
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+            <div class="mb-3">
+                <label for="inputEmail" class="form-label">Email</label>
+                <input type="email" value="{{ last_username }}" name="email" id="inputEmail" class="form-control" required autofocus>
+            </div>
+            <div class="mb-3">
+                <label for="inputPassword" class="form-label">Password</label>
+                <input type="password" name="password" id="inputPassword" class="form-control" required>
+            </div>
+            <button type="submit" class="btn btn-primary w-100">Login</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
